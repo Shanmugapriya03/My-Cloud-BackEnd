@@ -1,0 +1,24 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.10.6",
+    "mysql": "^2.5.4"
+  },
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/CodeFreaks/My-Cloud-BackEnd.git"
+  },
+  "author": "priyas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/CodeFreaks/My-Cloud-BackEnd/issues"
+  },
+  "homepage": "https://gitlab.com/CodeFreaks/My-Cloud-BackEnd#README"
+}
