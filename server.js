@@ -13,6 +13,10 @@ var connection = mysql.createConnection({
   database : 'CLOUD'
 });
 
+connection.connect(function(err){
+  if(err) throw err;
+});
+
 app.get('/', function (req, res) {
     res.sendFile( __dirname + "/" + "index.html" );
  });
@@ -20,20 +24,27 @@ app.get('/', function (req, res) {
 app.get('/login', function (req, res) {
   var name = req.query.userName;
   var pass = req.query.pass;
-   connection.connect();
-   connection.query('SELECT password from login WHERE username = ?',[name], function(err, rows, fields) {
-     if (!err){
-         if(rows[0].password == pass){
-           res.sendFile( __dirname + "/" + "login.html" );
-           console.log(rows[0].password);
-         }else{
-           res.end("username/password not valid");
-          }
-     }else{
-       console.log('Error while performing Query.');
-     }
-   });
-   connection.end();
+      connection.query('SELECT password from login WHERE username = ?',[name], function(err, rows, fields){
+        if(err) throw err;
+        if(rows.length>0){
+            if(rows[0].password == pass){
+                res.json({
+                  status: true,
+                  message: "Successfully Logged In"
+                });
+            }else{
+                res.json({
+                  status:false,
+                  message:"username and password does not match"
+                });
+            }
+        }else{
+          res.json({
+            status:false,
+            message:"Invalid username"
+          });
+        }
+     });//query ends
 });
 
 var server = app.listen(8000, function () {
