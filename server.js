@@ -47,6 +47,30 @@ app.get('/login', function (req, res) {
      });//query ends
 });
 
+app.get('/signup', function (req, res) {
+  var values ={
+  username:req.query.userName,
+  password:req.query.pass
+  }
+      connection.query('INSERT INTO login SET ?',[values], function(err, rows, fields){
+        if(err){
+          if(err.code=='ER_DUP_ENTRY'){
+            res.json({
+              status:false,
+              message:"User Already exists"
+            });
+          }else{
+            throw err;
+          }
+        }else{
+          res.json({
+            status:true,
+            message:"User Created Successfully"
+          });
+        }
+     });//query ends
+});
+
 var server = app.listen(8000, function () {
   var port = server.address().port
 

@@ -22,9 +22,6 @@ module.exports ={
       case '/':
               renderHtml('./index.html',response);
               break;
-      case '/login':
-              renderHtml('./login.html',response);
-              break;
       default :
               response.writeHead(404);
               response.write('File Not Found');
