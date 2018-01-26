@@ -5,6 +5,12 @@ http.createServer(app.handleRequest).listen(8000);*/
 var express = require('express');
 var app = express();
 
+var dockerCLI = require('docker-cli-js');
+var DockerOptions = dockerCLI.Options;
+var Docker = dockerCLI.Docker;
+
+var docker = new Docker();
+
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -14,7 +20,8 @@ var connection = mysql.createConnection({
 });
 
 connection.connect(function(err){
-  if(err) throw err;
+  if(err)
+    throw err;
 });
 
 app.use(function(req, res, next) {
@@ -77,6 +84,11 @@ app.get('/signup', function (req, res) {
      });//query ends
 });
 
+app.get('/dashboard',function(req,res){
+  docker.command('ps -a', function (err, data) {
+    res.json(data.containerList);
+  });
+});
 var server = app.listen(8000, function () {
   var port = server.address().port
 
