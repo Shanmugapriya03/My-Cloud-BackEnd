@@ -85,14 +85,9 @@ app.get('/signup', function (req, res) {
 });
 
 app.get('/dashboard/containers',function(req,res){
-  docker.command('ps -a', function (err, data) {
-    for(var container in data.containerList){
-      var container_id = data.containerList[container]['container id'];
-      docker.command('inspect '+container_id).then(function(cdata){
-        res.json(cdata.object);
-      })
-    }
-  });
+    docker.command('ps -a',function (err, data) {
+      res.json(data.containerList);
+    });
 });
 var server = app.listen(8000, function () {
   var port = server.address().port
