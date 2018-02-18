@@ -89,6 +89,33 @@ app.get('/dashboard/containers',function(req,res){
       res.json(data.containerList);
     });
 });
+
+app.get('/dashboard/create',function(req,res){
+    docker.command('images',function (err, data) {
+      res.json(data.images);
+    });
+});
+
+app.get('/dashboard/createContainer',function(req,res){
+  imageName = req.query.imageName;
+  containerName = req.query.containerName;
+    if(containerName==''){
+      cmd =imageName;
+    }else{
+      cmd ='--name '+containerName+' '+imageName;
+    }
+    docker.command('create -t '+cmd,function(err,data){
+        if(data=='null'){
+          res.json({
+            status:false
+          });
+        }else{
+          res.json({
+            status:true
+          });
+        }
+    });
+});
 var server = app.listen(8000, function () {
   var port = server.address().port
 
