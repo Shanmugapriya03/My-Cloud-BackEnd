@@ -48,7 +48,7 @@ app.get('/login', function (req, res) {
             }else{
                 res.json({
                   status:false,
-                  message:"username and password does not match"
+                  message:"password invalid"
                 });
             }
         }else{
@@ -84,10 +84,39 @@ app.get('/signup', function (req, res) {
      });//query ends
 });
 
-app.get('/dashboard/containers',function(req,res){
-    docker.command('ps -a',function (err, data) {
-      res.json(data.containerList);
+app.get('/dashboard/sysinfo',function(req,res){
+    docker.command('info',function (err, data) {
+      res.json(data.object);
     });
+});
+
+app.get('/dashboard/containers',function(req,res){
+    docker.command('ps -a --no-trunc',function (err, data) {
+      var name = req.query.userN;
+      connection.query('SELECT cId from containerInfo WHERE username = ?',[name], function(err, rows, fields){
+        if(err) throw err;
+        res.json({
+          data:data.containerList,
+          containerIds:rows
+        })
+      });//query ends
+    });
+});
+
+app.get('/dashboard/containers/start',function(req,res){
+  id = req.query.id;
+  docker.command('start '+id);
+  docker.command('inspect '+id,function(err,data){
+    res.json(data);
+  });
+});
+
+app.get('/dashboard/containers/stop',function(req,res){
+  id = req.query.id;
+  docker.command('stop '+id);
+  docker.command('inspect '+id,function(err,data){
+    res.json(data);
+  });
 });
 
 app.get('/dashboard/create',function(req,res){
@@ -99,6 +128,7 @@ app.get('/dashboard/create',function(req,res){
 app.get('/dashboard/createContainer',function(req,res){
   imageName = req.query.imageName;
   containerName = req.query.containerName;
+  userN =req.query.userN;
     if(containerName==''){
       cmd =imageName;
     }else{
@@ -110,9 +140,19 @@ app.get('/dashboard/createContainer',function(req,res){
             status:false
           });
         }else{
-          res.json({
-            status:true
-          });
+          var values ={
+            cId:data.raw,
+            username:req.query.userN
+          }
+            connection.query('INSERT INTO containerInfo SET ?',[values], function(err, rows, fields){
+              if(err){
+                throw err;
+              }else{
+                res.json({
+                  status:true
+                });
+              }
+           });//query ends
         }
     });
 });
