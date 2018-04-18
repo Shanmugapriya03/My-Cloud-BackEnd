@@ -103,19 +103,73 @@ app.get('/dashboard/containers',function(req,res){
     });
 });
 
+app.get('/dashboard/networking',function(req,res){
+  var name = req.query.userN;
+  connection.query('SELECT cId from containerInfo WHERE username = ?',[name], function(err, rows, fields){
+    if(err) throw err;
+    res.json({
+      containerIds:rows
+    })
+  });//query ends
+});
+
+app.get('/dashboard/inspect',function(req,res){
+  var id = req.query.id;
+    docker.command('inspect '+id,function (err, data) {
+      res.json(data.object[0]);
+    });
+});
+
 app.get('/dashboard/containers/start',function(req,res){
   id = req.query.id;
-  docker.command('start '+id);
-  docker.command('inspect '+id,function(err,data){
-    res.json(data);
+  docker.command('start '+id,function(err,data){
+    if(err){
+      res.json({
+        status:false
+      });
+    }else{
+      res.json({
+        status:true
+      });
+    }
   });
 });
 
 app.get('/dashboard/containers/stop',function(req,res){
   id = req.query.id;
-  docker.command('stop '+id);
-  docker.command('inspect '+id,function(err,data){
-    res.json(data);
+  docker.command('stop '+id,function(err,data){
+    if(err){
+      res.json({
+        status:false
+      });
+    }else{
+      res.json({
+        status:true
+      });
+    }
+  });
+});
+
+app.get('/dashboard/containers/del',function(req,res){
+  id = req.query.id;
+  docker.command('rm '+id,function(err,data){
+    if(err){
+      res.json({
+        status:false
+      });
+    }else{
+      connection.query('delete from containerInfo where cId=?',[id], function(err, rows, fields){
+        if(err){
+          throw err;
+        }else{
+          console.log(rows);
+          res.json({
+            status:true
+          });
+        }
+      });//query ends
+
+    }
   });
 });
 
